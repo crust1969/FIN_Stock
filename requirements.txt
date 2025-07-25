@@ -1,8 +1,18 @@
-streamlit
-yfinance
-pandas
-plotly
-requests
-langchain
-openai
-email-validator
+# --- App-Framework
+streamlit==1.35.0
+
+# --- Daten & Analyse
+yfinance==0.2.40
+pandas==2.2.2
+plotly==5.21.0
+requests==2.32.3
+email-validator==2.1.1
+
+# --- LangChain + OpenAI Agent
+openai==1.34.0
+langchain==0.2.2
+langchain-core==0.2.3
+langchain-community==0.2.3
+
+# Optional für dotenv-basierte Konfiguration
+python-dotenv==1.0.1
