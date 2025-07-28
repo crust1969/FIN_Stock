@@ -2,28 +2,10 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import requests
-import smtplib
-from email.mime.text import MIMEText
 import plotly.graph_objects as go
 from langchain.agents import Tool, initialize_agent
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.agents.agent_types import AgentType
-
-# 📬 E-Mail Alert senden
-def send_email_alert(subject, body):
-    try:
-        msg = MIMEText(body)
-        msg["Subject"] = subject
-        msg["From"] = st.secrets["EMAIL_USER"]
-        msg["To"] = st.secrets["EMAIL_TO"]
-
-        with smtplib.SMTP(st.secrets["EMAIL_HOST"], st.secrets["EMAIL_PORT"]) as server:
-            server.starttls()
-            server.login(st.secrets["EMAIL_USER"], st.secrets["EMAIL_PASS"])
-            server.sendmail(msg["From"], [msg["To"]], msg.as_string())
-        st.success("📧 Alert-E-Mail wurde gesendet!")
-    except Exception as e:
-        st.error(f"Fehler beim E-Mail-Versand: {e}")
 
 # 📈 Plotly-Chart
 def show_chart(symbol):
@@ -61,13 +43,6 @@ def get_indicators(symbol: str) -> str:
     signal_now = signal.iloc[-1]
     trend = "bullish" if macd_now > signal_now else "bearish"
 
-    # Optionaler Alert
-    if latest_rsi < 30:
-        send_email_alert(
-            subject=f"📉 RSI-Alarm für {symbol}",
-            body=f"RSI von {symbol} liegt bei {latest_rsi} → möglicher Kaufzeitpunkt?"
-        )
-
     return f"RSI: {latest_rsi} | MACD: {macd_now:.2f} vs Signal: {signal_now:.2f} → {trend}"
 
 def get_peg(symbol: str) -> str:
@@ -76,15 +51,6 @@ def get_peg(symbol: str) -> str:
     r = requests.get(url)
     if r.status_code == 200:
         peg = r.json().get("PEGRatio", "N/A")
-        try:
-            peg_val = float(peg)
-            if peg_val < 1:
-                send_email_alert(
-                    subject=f"📊 PEG-Alarm für {symbol}",
-                    body=f"PEG-Ratio von {symbol} = {peg} → möglich unterbewertet."
-                )
-        except:
-            pass
         return f"PEG-Ratio von {symbol}: {peg}"
     return "Fehler beim PEG-Abruf"
 
