@@ -3,6 +3,7 @@ yfinance
 pandas
 requests
 plotly
-langchain
-openai
+smtplib  # Nur wenn lokal getestet wird, sonst kein Effekt in Cloud
 email-validator
+langchain
+langchain-openai
